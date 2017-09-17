@@ -1,0 +1,120 @@
+---
+title: "Week 3 Assignment - R Character Manipulation and Date Processing"
+author: "Kalyanaraman Parthasarathy"
+output:
+  html_document:
+    code_folding: show
+    depth: 4
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# RPubs link - http://rpubs.com/kalyanparthasarathy/308799
+
+# Check if the package is installed. If not, install the package
+if(!require('stringr')) {
+  install.packages('stringr')
+  library(stringr)
+}
+
+raw.data <-"555-1239Moe Szyslak(636) 555-0113Burns, C. Montgomery555-6542Rev. Timothy Lovejoy555 8904Ned Flanders636-555-3226Simpson, Homer5553642Dr. Julius Hibbert"
+name <- unlist(str_extract_all(raw.data, "[[:alpha:]., ]{2,}"))
+
+```
+
+### Problem 3
+
+Copy the introductory example. The vector name stores the extracted names.
+R> name
+     [1] "Moe Szyslak"       "Burns, C. Montgomery" "Rev. Timothy Lovejoy"
+     [4] "Ned Flanders"      "Simpson, Homer"       "Dr. Julius Hibbert"
+(a) Use the tools of this chapter to rearrange the vector so that all elements conform to thestandardfirst_name last_name.
+(b) Construct a logical vector indicating whether a character has a title (i.e., Rev. and Dr.).
+(c) Construct a logical vector indicating whether a character has a second name.
+
+```{r}
+
+# (a). Use the tools of this chapter to rearrange the vector so that all elements conform to thestandardfirst_name last_name.
+firtName_LastName <- unlist(sub("([A-z]{1,}),  *([A-z]{1,})", "\\2 \\1", sub("[A-z]{1,}\\. "," ",name)))
+firtName_LastName
+
+# (b). Construct a logical vector indicating whether a character has a title (i.e., Rev. and Dr.).
+tileCheckVector <- c(str_detect(name, "(^[A-z]{1,}\\. ).*"))
+tileCheckDF <- data.frame(name, tileCheckVector)
+names(tileCheckDF) <- c("Name", "Has Title?")
+tileCheckDF
+
+# (c). Construct a logical vector indicating whether a character has a second name.
+secondNameCheckVector <- str_detect(name, " [A-z]{1,}\\. ")
+secondNameCheckDF <- data.frame(name, secondNameCheckVector)
+names(secondNameCheckDF) <- c("Name", "Has Second Name?")
+secondNameCheckDF
+
+```
+
+### Problem 4
+
+Describe the types of strings that conform to the following regular expressions and construct an example that is matched by the regular expression.
+(a) [0-9]+\\$
+(b) \\b[a-z]{1,4}\\b
+(c) .*?\\.txt$
+(d) \\d{2}/\\d{2}/\\d{4}
+(e) <(.+?)>.+?</\\1>
+
+```{r}
+
+# (a) [0-9]+\\$ - N number of digits followed by $
+cat("\014")
+q4aData <- c("Kalyan: 4073647173$", "Partha: 4073647173")
+q4aDataDF <- data.frame(q4aData, str_detect(q4aData, "[0-9]+\\$"))
+names(q4aDataDF) <- c("Data", "Pattern Matched?")
+q4aDataDF
+
+# (b) \\b[a-z]{1,4}\\b
+namesList <- c("tom phan", "chris esser", "eric fisher", "james johnson")
+namesListDF <- data.frame(namesList, str_detect(namesList, "\\b[a-z]{1,4}\\b"))
+names(namesListDF) <- c("Name", "Pattern Matched?")
+namesListDF
+
+# (c) .*?\\.txt$
+filesList <- c("ReadMe.txt", "index.html", "setup.ini", "resume.txt")
+filesListDF <- data.frame(filesList, str_detect(filesList, ".*?\\.txt$"))
+names(filesListDF) <- c("File Name", "Pattern Matched?")
+filesListDF
+
+# (d) \\d{2}/\\d{2}/\\d{4}
+dobList <- c("03/05/1981", "02-09-1976", "04/05/2005", "05-22-2010")
+dobListDF <- data.frame(dobList, str_detect(dobList, "(\\d{2}/\\d{2}/\\d{4})"))
+names(dobListDF) <- c("DOB", "Pattern Matched?")
+dobListDF
+
+# (e) <(.+?)>.+?</\\1>
+htmlScript <- c("<table>Table</table>", "<tr>Rows</tr>", "<td>Improper cell definition<td>")
+htmlScriptDF <- data.frame(htmlScript, str_detect(htmlScript, "<(.+?)>.+?</\\1>"))
+names(htmlScriptDF) <- c("HTML Syntax", "Pattern Matched?")
+htmlScriptDF
+
+
+```
+
+### Problem 9
+
+The following code hides a secret message. Crack it with R and regular expressions. Hint: Some of the characters are more revealing than others! The code snippet is also available in the materials at www.r-datacollection.com.
+clcopCow1zmstc0d87wnkig7OvdicpNuggvhryn92Gjuwczi8hqrfpRxs5Aj5dwpn0Tanwo
+Uwisdij7Lj8kpf03AT5Idr3coc0bt7yczjatOaootj55t3Nj3ne6c4Sfek.r1w1YwwojigO
+d6vrfUrbz2.2bkAnbhzgv4R9i05zEcrop.wAgnb.SqoU65fPa1otfb7wEm24k6t3sR9zqe5
+fy89n6Nd5t9kc4fE905gmc4Rgxo5nhDk!gr
+
+```{r}
+
+dataString <- "clcopCow1zmstc0d87wnkig7OvdicpNuggvhryn92Gjuwczi8hqrfpRxs5Aj5dwpn0TanwoUwisdij7Lj8kpf03AT5Idr3coc0bt7yczjatOaootj55t3Nj3ne6c4Sfek.r1w1YwwojigOd6vrfUrbz2.2bkAnbhzgv4R9i05zEcrop.wAgnb.SqoU65fPa1otfb7wEm24k6t3sR9zqe5fy89n6Nd5t9kc4fE905gmc4Rgxo5nhDk!gr"
+dataStringDecoded <- unlist(str_extract_all(dataString, "[[:upper:].]{1,}"))
+dataStringDecoded <- str_replace_all(paste(dataStringDecoded, collapse = ''), fixed("."), " ")
+dataStringDecoded
+
+```
